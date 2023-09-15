@@ -10,6 +10,7 @@ from functions import OpState
 
 class State(StatesGroup):
     register = State()
+    start = State()
 
 
 router = Router()
@@ -18,11 +19,11 @@ router = Router()
 async def cmd_start(message: types.Message, state: FSMContext):
     if not db.update_user(message.from_user):
         return
-    await state.clear()
+    await state.set_state(State.start)
     await message.answer("Hello")
 
 
-@router.message()
+@router.message(State.start)
 async def cmd_report(message: types.Message, state: FSMContext):
     split = message.text.split(' ')
     print(split)
@@ -74,6 +75,6 @@ async def write_to_db(
     data['usr_id'] = callback.from_user.id
     db.register(data)
     await callback.message.edit_text(text="Готово",  reply_markup=None)
-    await state.clear()
+    await state.set_state(State.start)
     
 
