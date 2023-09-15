@@ -2,12 +2,12 @@ import logging
 import asyncio
 from aiogram import Bot, Dispatcher
 from config_reader import config
-import handlers
+import handlers.data_input
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=config.bot_token.get_secret_value())
 dp = Dispatcher()
-dp.include_routers(handlers.router)
+dp.include_routers(handlers.data_input.router)
 
 async def main():
     await dp.start_polling(bot)
