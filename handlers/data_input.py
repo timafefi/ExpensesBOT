@@ -1,7 +1,7 @@
 from db import db
 from aiogram import types, Router, F, Bot
 from aiogram.fsm.context import FSMContext
-from keyboards import category_inline, main_keyboard
+from keyboards import category_inline
 from aiogram.filters.command import Command
 import functions
 from functions import OpState

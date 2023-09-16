@@ -57,14 +57,26 @@ class Db:
             db.update('usr', info, {'userid': user.id})
         elif not memory['uid'] and memory['username'] == user.username:
             db.update('usr', info, {'username': user.username})
+            db.insert('spend_sum', {'userid': user.id, 'amount': 0})
+            db.insert('earn_sum', {'userid': user.id, 'amount': 0})
         else:
             return 0
         return 1
 
 
     def register(self, data: dict):
+        _type = ''
+        if data['_type']:
+            _type = 'spend_sum'
+        else:
+            _type = 'earn_sum'
+        s = f"select amount from {_type} where userid={data['usr_id']}"
+        print(s)
+        self.cursor.execute(s);
+        total = self.cursor.fetchone()[0]
         data['created_dt'] = datetime.now().timestamp()
         db.insert("expences", data)
+        db.update(_type, {'amount': total+abs(data['amount'])}, {'userid': data['usr_id']})
 
 
     def check_db_exists(self):

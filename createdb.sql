@@ -21,21 +21,9 @@ create table expences(
 );
 
 
-create table unauthorized_access(
-    num integer primary key,
-    id integer,
-    first_name varchar(255),
-    last_name varchar(255),
-    is_bot boolean,
-    username varchar(255),
-    language_code varchar(255),
-    time datetime
-);
-
-
 create table earn_sum(
 	userid integer primary key,
-	amount float,
+	amount float default 0,
 	FOREIGN KEY (userid) REFERENCES USR(USERID)
 );
 
