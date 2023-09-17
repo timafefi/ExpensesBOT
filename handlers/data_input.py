@@ -19,7 +19,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await message.answer("Hello")
 
 
-@router.message(State.start)
+@router.message(State.start, F.text)
 async def cmd_report(message: types.Message, state: FSMContext):
     split = message.text.split(' ')
     print(split)
@@ -40,7 +40,7 @@ async def cmd_report(message: types.Message, state: FSMContext):
 
     elif functions.get_operation(split) == OpState.earning:
         print('earning')
-        data = {'usr_id': message.from_user.id, '_type': 0}
+        data = {'userid': message.from_user.id, '_type': 0}
         try:
             data['amount'] = abs(float(split[0]))
             if len(split) > 1:
@@ -68,7 +68,7 @@ async def write_to_db(
         state: FSMContext):
     data = await state.get_data()
     data['category'] = callback_data.index
-    data['usr_id'] = callback.from_user.id
+    data['userid'] = callback.from_user.id
     db.register(data)
     await callback.message.edit_text(text="Готово",  reply_markup=None)
     await state.set_state(State.start)

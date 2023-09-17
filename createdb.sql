@@ -12,24 +12,10 @@ create table usr(
 create table expences(
 	id integer primary key,
 	_type boolean,
-	usr_id integer,
+	userid integer,
 	amount float,
 	msg varchar(255),
 	category integer default -1,
 	created_dt float,
-	FOREIGN KEY (usr_id) REFERENCES usr(userid)
-);
-
-
-create table earn_sum(
-	userid integer primary key,
-	amount float default 0,
-	FOREIGN KEY (userid) REFERENCES USR(USERID)
-);
-
-
-create table spend_sum(
-	userid integer primary key,
-	amount float,
-	FOREIGN KEY (userid) REFERENCES USR(USERID)
+	FOREIGN KEY (userid) REFERENCES usr(userid)
 );

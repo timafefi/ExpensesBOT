@@ -1,5 +1,6 @@
 from db import db
 import enum
+import datetime
 
 OpState = enum.Enum(
     value='state',
@@ -41,3 +42,8 @@ def get_operation(s):
     except ValueError:
         pass
     return OpState.invalid
+
+
+def curr_month_timestamp():
+    return datetime.combine(datetime.date().replace(day=1),
+                            datetime.min.time()).timestamp()

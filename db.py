@@ -65,18 +65,8 @@ class Db:
 
 
     def register(self, data: dict):
-        _type = ''
-        if data['_type']:
-            _type = 'spend_sum'
-        else:
-            _type = 'earn_sum'
-        s = f"select amount from {_type} where userid={data['usr_id']}"
-        print(s)
-        self.cursor.execute(s);
-        total = self.cursor.fetchone()[0]
         data['created_dt'] = datetime.now().timestamp()
         db.insert("expences", data)
-        db.update(_type, {'amount': total+abs(data['amount'])}, {'userid': data['usr_id']})
 
 
     def check_db_exists(self):
@@ -132,6 +122,56 @@ class Db:
         self.conn.commit()
 
 
+    def renew_counter(self):
+        for i in ['spend_sum', 'earn_sum']:
+            s = f'update {i} set amount=0'
+            self.cursor.execute(s)
+        self.conn.commit()
+
+
+    def get_users(self):
+        s = 'select userid from usr'
+        self.cursor.execute(s)
+        return self.cursor.fetchall()
+
+
+    def get_where(self, userid, date):
+        l = []
+        if userid:
+            l.append(f'userid={userid}')
+        if date:
+            l.append(f"created_dt>{date}")
+        return 'and'.join(l)
+
+
+    def get_expences(self, userid='', date=''):
+        s = f'select usr.username, _type, category, amount, msg, created_dt '\
+            f'from expences join usr on usr.userid=expences.usr_id'
+        where = self.get_where(userid, date)
+        self.cursor.execute(f'{s} {where}')
+        return self.cursor.fetchall()
+
+
+    def get_sum(self, userid='', date=''):
+        s = f'select sum(amount) from expences'
+        where = self.get_where(userid, date)
+        self.cursor.execute(f'{s} {where} group by _type')
+        return self.cursor.fetchall()
+        
+
+    def get_info(self, userid='', from_date=''):
+        '''
+        data = {
+            'total': int,
+            'spent':float,
+            'earned':float,
+            'body': ((username, _type, category, amount, msg, created_dt), ...)
+        }
+        '''
+        data['body'] = self.get_expences(userid, from_date)
+        data['total'] = len(data['body'])
+        data['earned'], data['spent'] = self.get_sum(userid, from_date)
+        return data
 
 
 db = Db()
