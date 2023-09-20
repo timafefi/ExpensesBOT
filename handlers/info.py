@@ -14,6 +14,8 @@ pages = Pages(10)
 async def cmd_stats(message: types.Message, state: FSMContext):
     data = db.get_info(offset=0, limit=pages.lines,from_date=functions.cm_stamp())
     maxlines = db.count_all_expences()
+    if not maxlines:
+        maxlines = 0
     stats = functions.print_stats(data)
     print(pages.generate(maxlines, offset=0))
     await message.answer(stats, parse_mode='html',
@@ -22,7 +24,6 @@ async def cmd_stats(message: types.Message, state: FSMContext):
 
 @router.callback_query(PagesFact.filter())
 async def move_pages(callback: types.CallbackQuery, callback_data: PagesFact):
-    print("ji")
     if callback_data.action == 'left':
         new_offset = callback_data.offset-pages.lines
     elif callback_data.action == 'right':
