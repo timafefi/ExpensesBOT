@@ -56,9 +56,8 @@ class Db:
         if memory['uid'] and (memory['uid'] == user.id):
             db.update('usr', info, {'userid': user.id})
         elif not memory['uid'] and memory['username'] == user.username:
+            print('lalal')
             db.update('usr', info, {'username': user.username})
-            db.insert('spend_sum', {'userid': user.id, 'amount': 0})
-            db.insert('earn_sum', {'userid': user.id, 'amount': 0})
         else:
             return 0
         return 1
@@ -107,7 +106,7 @@ class Db:
     def update(self, table: str, column_values: dict, filtr: dict = {}):
         cols = []
         for key in column_values.keys():
-            if type(column_values[key]) != str:
+            if type(column_values[key]) != str and column_values[key] != None:
                 cols.append(f'{key}={column_values[key]}')
             else:
                 cols.append(f"{key}='{column_values[key]}'")
@@ -144,22 +143,32 @@ class Db:
         return 'and'.join(l)
 
 
-    def get_expences(self, userid='', date=''):
+    def get_expences(self, userid='', date='', offset=0, limit=0):
         s = f'select usr.username, _type, category, amount, msg, created_dt '\
-            f'from expences join usr on usr.userid=expences.usr_id'
+            f'from expences join usr on usr.userid=expences.userid'
         where = self.get_where(userid, date)
-        self.cursor.execute(f'{s} {where}')
+        query = f'{s} where {where} order by created_dt desc '\
+                f'limit {limit} offset {offset}'
+        print(query)
+        self.cursor.execute(query)
         return self.cursor.fetchall()
 
 
     def get_sum(self, userid='', date=''):
-        s = f'select sum(amount) from expences'
+        s = f'select _type, sum(amount) from expences'
         where = self.get_where(userid, date)
-        self.cursor.execute(f'{s} {where} group by _type')
-        return self.cursor.fetchall()
+        self.cursor.execute(f'{s} where {where} group by _type')
+        vals = self.cursor.fetchall()
+        print(vals)
+        ans = [0, 0]
+        if vals:
+            ans[vals[0][0]] = vals[0][1]
+            if len(vals)>1:
+                ans[vals[1][0]] = vals[1][1]
+        return ans
         
 
-    def get_info(self, userid='', from_date=''):
+    def get_info(self, userid='', offset=0, limit=0, from_date=''):
         '''
         data = {
             'total': int,
@@ -168,10 +177,21 @@ class Db:
             'body': ((username, _type, category, amount, msg, created_dt), ...)
         }
         '''
-        data['body'] = self.get_expences(userid, from_date)
-        data['total'] = len(data['body'])
+        data = {}
+        data['body'] = self.get_expences(userid, from_date, offset, limit)
+        sums = self.get_sum(userid, from_date)
         data['earned'], data['spent'] = self.get_sum(userid, from_date)
+        data['total'] = data['earned']-data['spent']
+        print(data)
         return data
+
+    def count_all_expences(self):
+        s = "select sum(1) from expences"
+        self.cursor.execute(s)
+        ans = self.cursor.fetchone()
+        if ans:
+            return ans[0]
+        return 0
 
 
 db = Db()

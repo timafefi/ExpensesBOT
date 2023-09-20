@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import SecretStr
+from text import Emoji
 
 class Settings(BaseSettings):
     bot_token: SecretStr
@@ -8,8 +9,14 @@ class Settings(BaseSettings):
         {'username': 'darystroganova', 'admin': False}
 
     ]
-    categories: tuple = ['Продукты', 'Фастфуд/Рестораны',
-        'Различные товары', 'Связь/Подписки', 'Транспорт', 'Аренда']
+    categories: tuple = [
+        f'Продукты{Emoji.food}',
+        f'Рестораны {Emoji.cafe}',
+        f'Разное{Emoji.other}', 
+        f'Подписки{Emoji.subscriptions}',
+        f'Транспорт{Emoji.transport}',
+        f'Аренда{Emoji.rent}'
+    ]
 
     class Config:
         env_file = '.env'

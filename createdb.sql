@@ -13,8 +13,8 @@ create table expences(
 	id integer primary key,
 	_type boolean,
 	userid integer,
-	amount float,
-	msg varchar(255),
+	amount float default 0,
+	msg varchar(255) default 'empty',
 	category integer default -1,
 	created_dt float,
 	FOREIGN KEY (userid) REFERENCES usr(userid)
