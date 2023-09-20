@@ -7,6 +7,7 @@ import functions
 from keyboards.pageskb import Pages, PagesFact
 
 router = Router()
+router.message.filter(State.start)
 pages = Pages(10)
 
 @router.message(Command('stats'))

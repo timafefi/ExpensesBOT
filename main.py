@@ -3,7 +3,6 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from config_reader import config
 from handlers import data_input, info
-from scheduler import Scheduler
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 async def set_commands(bot: Bot):
