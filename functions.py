@@ -9,6 +9,20 @@ OpState = enum.Enum(
     names=('spending', 'earning', 'zero', 'invalid')
 )
 
+monthdict = {
+    '1': 'Январь',
+    '2': 'Февраль',
+    '3': 'Март',
+    '4': 'Апрель',
+    '5': 'Май',
+    '6': 'Июнь',
+    '7': 'Июль',
+    '8': 'Август',
+    '9': 'Сентябрь',
+    '10': 'Октябрь',
+    '11': 'Ноябрь',
+    '12': 'Декабрь'
+}
 
 
 def collect_and_register(data: dict):
@@ -20,7 +34,6 @@ def collect_and_register(data: dict):
             }
     if d['_type'] == 1:
         d['category'] = data['category']
-    print(d)
     db.register(d)
 
 
@@ -51,16 +64,22 @@ def cm_stamp():
                             datetime.min.time()).timestamp()
 
 
+
+
 def print_stats(data):
-    s = f"{Emoji.money_bag} Баланс: {data['earned']-data['spent']}\n"\
-    f"{Emoji.earn} Заработано: {data['earned']}\n"\
-    f"{Emoji.spend} Потрачено: {data['spent']}\n"\
-    f"_________________________________________________________________\n"\
+    under = "_________________________________________________________________\n"
+    s = f"{Emoji.money_bag} Баланс: {data['total']}\n"\
+    f"{Emoji.earn} Заработано ({monthdict[str(date.today().month)]}): {data['earned']}\n"\
+    f"{Emoji.spend} Потрачено ({monthdict[str(date.today().month)]}): {data['spent']}\n{under}"\
     f"Последние операции:\n"
 
     tab = '   |__   '
-    
+    prev_month = date.today().month
     for op in data['body']:
+        curr_month = datetime.fromtimestamp(op[5]).month
+        if (prev_month != curr_month):
+            s = f"{s}\n{under}{monthdict[str(curr_month)]}\n{under}\n" 
+            prev_month = curr_month
         if op[1]:
             sign = Emoji.minus
             ts = '-'

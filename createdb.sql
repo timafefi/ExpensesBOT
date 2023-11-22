@@ -19,3 +19,8 @@ create table expences(
 	created_dt float,
 	FOREIGN KEY (userid) REFERENCES usr(userid)
 );
+
+create table total(
+	earned integer default 0,
+	spent integer default 0
+)

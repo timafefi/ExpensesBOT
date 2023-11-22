@@ -17,7 +17,6 @@ async def cmd_stats(message: types.Message, state: FSMContext):
     if not maxlines:
         maxlines = 0
     stats = functions.print_stats(data)
-    print(pages.generate(maxlines, offset=0))
     await message.answer(stats, parse_mode='html',
                          reply_markup=pages.generate(maxlines, offset=0))
 

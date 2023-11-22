@@ -23,10 +23,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
 @router.message(State.start, F.text)
 async def cmd_report(message: types.Message, state: FSMContext):
     split = message.text.split(' ')
-    print(split)
 
     if functions.get_operation(split) == OpState.spending:
-        print('spending')
         await state.update_data(_type=1)
         try:
             await state.update_data(amount=abs(float(split[0])))
@@ -40,7 +38,6 @@ async def cmd_report(message: types.Message, state: FSMContext):
         await state.set_state(State.register)
 
     elif functions.get_operation(split) == OpState.earning:
-        print('earning')
         data = {'userid': message.from_user.id, '_type': 0}
         try:
             data['amount'] = abs(float(split[0]))

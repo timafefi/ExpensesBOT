@@ -21,6 +21,9 @@ class Db:
     def create_users(self):
         for user in config.users:
             self.insert('usr', user)
+    
+    def init_total(self):
+        self.insert('total', {'spent': 0, 'earned': 0})
 
 
     def get_username_and_UID(self, username='', uid=0):
@@ -38,7 +41,6 @@ class Db:
         if s2:
             wherelist.append(s2)
         req = ' '.join([s, ' or '.join(wherelist)])
-        print(req)
         self.cursor.execute(req)
         response =  self.cursor.fetchone()
         return {'uid': response[0], 'username': response[1]}
@@ -56,16 +58,30 @@ class Db:
         if memory['uid'] and (memory['uid'] == user.id):
             db.update('usr', info, {'userid': user.id})
         elif not memory['uid'] and memory['username'] == user.username:
-            print('lalal')
             db.update('usr', info, {'username': user.username})
         else:
             return 0
         return 1
 
+    def get_total(self, earned=0, spent=0):
+        s = 'select * from total'
+        self.cursor.execute(s)
+        answer = self.cursor.fetchall()
+        ret = {}
+        if answer and answer[0]:
+            ret['earned'] = answer[0][0] + earned
+            ret['spent'] = answer[0][1] + spent
+        return ret
 
     def register(self, data: dict):
         data['created_dt'] = datetime.now().timestamp()
         db.insert("expences", data)
+        total = {}
+        if data['_type'] == 0:
+            total = self.get_total(earned=data['amount'])
+        else:
+            total = self.get_total(spent=data['amount'])
+        self.update('total', total,)
 
 
     def check_db_exists(self):
@@ -80,6 +96,7 @@ class Db:
             self.cursor.executescript(sql)
             self.conn.commit()
         self.create_users()
+        self.init_total()
 
 
     def insert(self, table: str, column_values: dict):
@@ -105,6 +122,7 @@ class Db:
 
     def update(self, table: str, column_values: dict, filtr: dict = {}):
         cols = []
+        s = ''
         for key in column_values.keys():
             if type(column_values[key]) != str and column_values[key] != None:
                 cols.append(f'{key}={column_values[key]}')
@@ -114,9 +132,9 @@ class Db:
         cols = []
         if filtr:
             where = self.where_chain(filtr, 'and')
-        values = tuple(column_values.values())
-        s = f'update {table} set {columns} where {where}'
-        print(s)
+            s = f'update {table} set {columns} where {where}'
+        else:
+            s = f'update {table} set {columns}'
         self.cursor.execute(s)
         self.conn.commit()
 
@@ -146,10 +164,10 @@ class Db:
     def get_expences(self, userid='', date='', offset=0, limit=0):
         s = f'select usr.username, _type, category, amount, msg, created_dt '\
             f'from expences join usr on usr.userid=expences.userid'
-        where = self.get_where(userid, date)
-        query = f'{s} where {where} order by created_dt desc '\
+        #where = self.get_where(userid, date)
+        #query = f'{s} where {where} order by created_dt desc '\
+        query = f'{s} order by created_dt desc '\
                 f'limit {limit} offset {offset}'
-        print(query)
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
@@ -159,7 +177,6 @@ class Db:
         where = self.get_where(userid, date)
         self.cursor.execute(f'{s} where {where} group by _type')
         vals = self.cursor.fetchall()
-        print(vals)
         ans = [0, 0]
         if vals:
             ans[vals[0][0]] = vals[0][1]
@@ -181,8 +198,8 @@ class Db:
         data['body'] = self.get_expences(userid, from_date, offset, limit)
         sums = self.get_sum(userid, from_date)
         data['earned'], data['spent'] = self.get_sum(userid, from_date)
-        data['total'] = data['earned']-data['spent']
-        print(data)
+        total = self.get_total()
+        data['total'] = total['earned']-total['spent']
         return data
 
     def count_all_expences(self):

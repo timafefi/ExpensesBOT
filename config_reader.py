@@ -10,12 +10,12 @@ class Settings(BaseSettings):
 
     ]
     categories: tuple = [
-        f'Продукты{Emoji.food}',
-        f'Рестораны {Emoji.cafe}',
-        f'Разное{Emoji.other}', 
-        f'Подписки{Emoji.subscriptions}',
-        f'Транспорт{Emoji.transport}',
-        f'Аренда{Emoji.rent}'
+        f'Продукты{Emoji.food}',                  #0
+        f'Рестораны {Emoji.cafe}',                #1
+        f'Разное{Emoji.other}',                   #2 
+        f'Подписки{Emoji.subscriptions}',         #3
+        f'Транспорт{Emoji.transport}',            #4
+        f'Аренда{Emoji.rent}'                     #5
     ]
 
     class Config:
