@@ -9,7 +9,7 @@ class Db:
 
     def __init__(self):
         try:
-            path = os.getcwd()+'/'+os.path.join("db", "helper.db")
+            path = os.getcwd()+'/'+os.path.join("db", "database.db")
             detect_types = sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES
             self.conn = sqlite3.connect(path, detect_types=detect_types)
         except Exception as e:
