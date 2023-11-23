@@ -1,14 +1,11 @@
 from pydantic_settings import BaseSettings
 from pydantic import SecretStr
 from text import Emoji
+import users
 
 class Settings(BaseSettings):
     bot_token: SecretStr
-    users: tuple = [
-        {'username': 'timafefi', 'admin': True},
-        {'username': 'darystroganova', 'admin': False}
-
-    ]
+    users: tuple = users.users
     categories: tuple = [
         f'Продукты{Emoji.food}',                  #0
         f'Рестораны {Emoji.cafe}',                #1
