@@ -1,5 +1,5 @@
 # ExpencesBOT (Telegram)
-![](https://github.com/timafefi/expences_bot/blob/master/pics/1.mp4 "example")
+![](pics/intro.gif)
 ## Описание
 ExpencesBOT - это Telegram бот для учёта доходов и расходов. Одним запущенным ботом могут пользоваться несколько человек одновременно. Так можно удобно следить за общим бюджетом.
 ## Установка и запуск
